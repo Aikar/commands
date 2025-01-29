@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.SelfUser;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,6 +18,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class JDACommandManager extends CommandManager<
         MessageReceivedEvent,
@@ -237,6 +240,7 @@ public class JDACommandManager extends CommandManager<
     void dispatchEvent(MessageReceivedEvent event) {
         Message message = event.getMessage();
         String msg = message.getContentRaw();
+        String selfUserId = event.getJDA().getSelfUser().getId();
 
         CommandConfig config = getCommandConfig(event);
 
@@ -247,11 +251,19 @@ public class JDACommandManager extends CommandManager<
                 break;
             }
         }
+        if (prefixFound == null && config.mentionPrefixEnabled()) {
+            if (msg.startsWith("<@" + selfUserId + ">")) {
+                prefixFound = "<@" + selfUserId + ">";
+            } else if (msg.startsWith("<@!" + selfUserId + ">")) {
+                prefixFound = "<@!" + selfUserId + ">";
+            }
+        }
         if (prefixFound == null) {
             return;
         }
 
-        String[] args = ACFPatterns.SPACE.split(msg.substring(prefixFound.length()), -1);
+        String msgNoPrefix = msg.substring(prefixFound.length());
+        String[] args = ACFPatterns.SPACE.split(ACFUtil.replace(msgNoPrefix, ACFPatterns.getPattern("^[ ]+"), ""), -1);
         if (args.length == 0) {
             return;
         }
