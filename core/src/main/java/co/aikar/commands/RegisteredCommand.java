@@ -263,6 +263,13 @@ public class RegisteredCommand<CEC extends CommandExecutionContext<CEC, ? extend
                 }
             }
 
+            if (parameter.getRegexPattern() != null && !context.getFirstArg().matches(parameter.getRegexPattern())) {
+                sender.sendMessage(MessageType.ERROR, MessageKeys.INVALID_SYNTAX,
+                        "{command}", manager.getCommandPrefix(sender) + command,
+                        "{syntax}", syntaxText);
+                throw new InvalidCommandArgument(false);
+            }
+
             if (parameter.getValues() != null) {
                 String arg = !args.isEmpty() ? args.get(0) : "";
 

@@ -29,6 +29,7 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandCompletion;
 import co.aikar.commands.annotation.HelpCommand;
 import co.aikar.commands.annotation.Private;
+import co.aikar.commands.annotation.Regex;
 import co.aikar.commands.annotation.Subcommand;
 import org.bukkit.command.CommandSender;
 
@@ -41,14 +42,19 @@ public class SomeCommand_ExtraSubs extends BaseCommand {
         sender.sendMessage(hi);
     }
 
+    @Subcommand("testsub test3")
+    public void onTestSub3(CommandSender sender, @Regex("\\d{2}") int value) {
+        sender.sendMessage(String.valueOf(value));
+    }
+
     @Private
     @Subcommand("testsub private")
-    public void privateSub(CommandSender sender){
+    public void privateSub(CommandSender sender) {
         sender.sendMessage("Am a sneaky ninja!");
     }
 
     @HelpCommand
-    public void help(CommandSender sender, CommandHelp help){
+    public void help(CommandSender sender, CommandHelp help) {
         help.showHelp();
     }
 }
