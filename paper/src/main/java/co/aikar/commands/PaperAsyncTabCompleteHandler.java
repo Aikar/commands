@@ -77,6 +77,7 @@ class PaperAsyncTabCompleteHandler implements Listener {
 
         BukkitCommandIssuer issuer = this.manager.getCommandIssuer(sender);
         List<String> completions = rootCommand.getTabCompletions(issuer, commandLabel, args, false, async);
+        completions.removeAll(Arrays.asList(args));
 
         return ACFUtil.preformOnImmutable(existingCompletions, (list) -> list.addAll(completions));
     }
