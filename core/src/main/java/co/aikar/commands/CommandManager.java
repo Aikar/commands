@@ -329,12 +329,29 @@ public abstract class CommandManager<
         if (permission == null || permission.isEmpty()) {
             return true;
         }
-        for (String perm : ACFPatterns.COMMA.split(permission)) {
-            if (!perm.isEmpty() && !issuer.hasPermission(perm)) {
-                return false;
+
+        //handle commas as an AND operation
+        if (permission.contains(",")) {
+            for (String perm : ACFPatterns.COMMA.split(permission)) {
+                if (!perm.isEmpty() && !issuer.hasPermission(perm)) {
+                    return false;
+                }
             }
+            return true;
         }
-        return true;
+
+        //handle pipe as an OR operation
+        if (permission.contains("|")) {
+            for (String perm : ACFPatterns.PIPE.split(permission)) {
+                if (!perm.isEmpty() && issuer.hasPermission(perm)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        //if none are used just test the permission itself
+        return issuer.hasPermission(permission);
     }
 
     public synchronized RootCommand getRootCommand(@NotNull String cmd) {
